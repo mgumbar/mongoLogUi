@@ -12,20 +12,17 @@ RUN rm -rf /usr/share/nginx/html/*
 
 ##CMD ["nginx", "-g", "daemon off;"]
 
-FROM node:7 as build
-WORKDIR /mongoLogUi
+FROM node:9.6.1
 
-COPY package.json /mongoLogUi
-RUN npm install -g @angular/cli
+RUN mkdir /usr/src/angularapp
+WORKDIR /usr/src/angularapp
+
+ENV PATH /usr/src/angularapp/node_modules/.bin:$PATH
+
+COPY package.json /usr/src/angularapp/package.json
 RUN npm install
-RUN npm run ng build -prod
+RUN npm install -g @angular/cli@1.7.1
 
-COPY . /mongoLogUi
+COPY . /usr/src/angularapp
 
-FROM alpine:3.4 as deploy
-
-COPY --from=build /mongoLogUi/dist/ /dist/
-
-ENV LISTEN_PORT=80
-
-EXPOSE 80
+CMD ng serve --host 0.0.0.0

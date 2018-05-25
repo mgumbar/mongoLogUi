@@ -21,7 +21,7 @@ ENV PATH /usr/src/angularapp/node_modules/.bin:$PATH
 
 COPY package.json /usr/src/angularapp/package.json
 RUN npm install
-RUN npm install -g @angular/cli@1.7.1
+RUN npm install -g @angular/cli --unsafe
 
 COPY . /usr/src/angularapp
 

@@ -12,22 +12,20 @@ RUN rm -rf /usr/share/nginx/html/*
 
 ##CMD ["nginx", "-g", "daemon off;"]
 
-FROM node:alpine
+FROM node:7 as build
+WORKDIR /mongoLogUi
 
-RUN mkdir -p /usr/src/mongoLogUi
-WORKDIR /usr/src/mongoLogUi
-RUN npm install -g http-server
-
-COPY . /usr/src/mongoLogUi
-
+COPY package.json /mongoLogUi
 RUN npm install -g @angular/cli
-
-COPY package.json /usr/src/mongoLogUi/
-
 RUN npm install
+RUN npm run ng build -prod
 
-CMD [ "ng", "build" ]
+COPY . /mongoLogUi
 
-EXPOSE 4200
+FROM alpine:3.4 as deploy
 
-CMD ["cd", "/usr/src/mongoLogUi/dist", "http-server" ,"-p", "4200"]
+COPY --from=build /mongoLogUi/dist/ /dist/
+
+ENV LISTEN_PORT=80
+
+EXPOSE 80
